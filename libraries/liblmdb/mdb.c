@@ -4492,23 +4492,23 @@ const PIMAGE_TLS_CALLBACK mdb_tls_cbp __attribute__((section (".CRT$XLB"))) = md
 PIMAGE_TLS_CALLBACK mdb_tls_cbp __attribute__((section (".CRT$XLB"))) = mdb_tls_callback;
 #endif
 #else
-#ifdef _WIN64
+#ifdef _M_IX86
 /* Force some symbol references.
  *	_tls_used forces the linker to create the TLS directory if not already done
  *	mdb_tls_cbp prevents whole-program-optimizer from dropping the symbol.
  */
+#pragma comment(linker, "/INCLUDE:__tls_used")
+#pragma comment(linker, "/INCLUDE:_mdb_tls_cbp")
+#pragma data_seg(".CRT$XLB")
+PIMAGE_TLS_CALLBACK mdb_tls_cbp = mdb_tls_callback;
+#pragma data_seg()
+#else	/* _WIN32 */
 #pragma comment(linker, "/INCLUDE:_tls_used")
 #pragma comment(linker, "/INCLUDE:mdb_tls_cbp")
 #pragma const_seg(".CRT$XLB")
 extern const PIMAGE_TLS_CALLBACK mdb_tls_cbp;
 const PIMAGE_TLS_CALLBACK mdb_tls_cbp = mdb_tls_callback;
 #pragma const_seg()
-#else	/* _WIN32 */
-#pragma comment(linker, "/INCLUDE:__tls_used")
-#pragma comment(linker, "/INCLUDE:_mdb_tls_cbp")
-#pragma data_seg(".CRT$XLB")
-PIMAGE_TLS_CALLBACK mdb_tls_cbp = mdb_tls_callback;
-#pragma data_seg()
 #endif	/* WIN 32/64 */
 #endif	/* !__GNUC__ */
 #endif
